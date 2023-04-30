@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Comment;
+use App\Models\Plant;
+use App\Observers\CommentObserver;
+use App\Observers\PlantObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -25,7 +29,8 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Comment::observe(CommentObserver::class);
+        Plant::observe(PlantObserver::class);
     }
 
     /**

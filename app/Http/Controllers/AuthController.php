@@ -2,32 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUserRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(StoreUserRequest $request): JsonResponse
     {
-        $validatedData = $request->validate([
-            'firstName' => 'required|string|max:255',
-            'lastName' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'address' => 'required|string|max:255',
-            'postCode' => 'required|string|max:5',
-        ]);
-
-        $user = User::create([
-            'firstName' => $validatedData['firstName'],
-            'lastName' => $validatedData['lastName'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-            'address' => $validatedData['address'],
-            'postCode' => $validatedData['postCode'],
-        ]);
+        $user = new User();
+        $user->fill($request->validated());
+        $user->id = Str::uuid();
+        $user->password = Hash::make($request->get('password'));
+        $user->save();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -37,7 +28,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
@@ -45,8 +36,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user = User::where('email', $request['email'])->firstOrFail();
-
+        $user = User::where('email', $request->get('email'))->firstOrFail();
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -55,8 +45,9 @@ class AuthController extends Controller
         ]);
     }
 
-    public function me(Request $request)
-    {
-        return $request->user();
+    public function currentUser(): JsonResponse {
+        return response()->json([
+            'data' => Auth::user()->load('ownedPlants', 'guardedPlants')
+        ]);
     }
 }

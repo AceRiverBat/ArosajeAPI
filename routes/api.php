@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CommentsController;
+use App\Http\Controllers\PlantController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -22,15 +24,23 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 
-Route::get('/users/{Id}/role', [App\Http\Controllers\UserController::class, 'getUserRole']);
-Route::get('/user/{Id}/plants', [UserController::class, 'getUserPlants']);
-Route::get('/plant/{id}', [PlantController::class, 'getPlantById']);
-Route::delete('/plant/{id}', [PlantController::class, 'deletePlant']);
-Route::put('/user/{id}', [UserController::class, 'update']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me', [AuthController::class, 'currentUser']);
 
-Route::get('/plants', [App\Http\Controllers\PlantController::class, 'index']);
-Route::get('/plants/search', [App\Http\Controllers\PlantController::class, 'search']);
-Route::post('/users/{userId}/plants', [PlantController::class, 'create'])->middleware('auth:sanctum');
+    Route::put('/user/{user}', [UserController::class, 'update']);
+
+    Route::prefix('/plants')->group(function () {
+        Route::get('', [PlantController::class, 'index']);
+        Route::post('/search', [PlantController::class, 'search']);
+        Route::get('/{plant}', [PlantController::class, 'getPlantById']);
+        Route::post('/store', [PlantController::class, 'store']);
+        Route::delete('/{plant}', [PlantController::class, 'deletePlant']);
+        Route::put('/{plant}/guardian/store', [PlantController::class, 'storeGuardian']);
+    });
+
+    Route::prefix('/comments')->group(function () {
+       Route::post('/plants/{plant}/store', [CommentsController::class, 'store']);
+    });
+});
 
