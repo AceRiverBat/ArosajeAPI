@@ -23,4 +23,33 @@ class UserController extends Controller
 
         return response()->json(['message' => 'User updated successfully', 'user' => $user]);
     }
+
+    public function getUserPlants($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        $plants = $user->plants;
+        if (!$plants) {
+            return response()->json(null);
+        } else {
+            return response()->json(['plants' => $plants]);
+        }
+    }
+    public function getUserRole($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        $role = $user->role;
+        if (!$role) {
+            return response()->json(null);
+        } else {
+            return response()->json(['role' => $role]);
+        }
+    }
 }

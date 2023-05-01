@@ -26,9 +26,12 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/me', [AuthController::class, 'currentUser']);
+    Route::post('/me', [AuthController::class, 'currentUser']);
 
-    Route::put('/user/{user}', [UserController::class, 'update']);
+    Route::put('/user/{id}', [UserController::class, 'update']);
+
+    Route::get('/users/{id}/role', [UserController::class, 'getUserRole']);
+    Route::get('/user/{id}/plants', [UserController::class, 'getUserPlants']);
 
     Route::prefix('/plants')->group(function () {
         Route::get('', [PlantController::class, 'index']);
@@ -40,7 +43,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('/comments')->group(function () {
-       Route::post('/plants/{plant}/store', [CommentsController::class, 'store']);
+        Route::post('/plants/{plant}/store', [CommentsController::class, 'store']);
     });
 });
-

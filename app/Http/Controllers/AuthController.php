@@ -45,9 +45,8 @@ class AuthController extends Controller
         ]);
     }
 
-    public function currentUser(): JsonResponse {
-        return response()->json([
-            'data' => Auth::user()->load('ownedPlants', 'guardedPlants')
-        ]);
+    public function currentUser(Request $request){
+    return response()->json($request->user());
     }
+
 }

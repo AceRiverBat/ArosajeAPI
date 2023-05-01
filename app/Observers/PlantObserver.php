@@ -25,8 +25,8 @@ class PlantObserver
 
     public function updating(Plant $plant): void
     {
-        abort_if($plant->owner->getKey() === Auth::user()->getKey(), 403, 'Unable to be the guardian of your plant');
-    }
+        abort_if($plant->owner_id === Auth::id(), 403, 'Unable to be the guardian of your plant');
+    }    
 
     /**
      * Handle the Plant "deleted" event.
