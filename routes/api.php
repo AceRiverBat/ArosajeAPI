@@ -31,7 +31,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user/{id}', [UserController::class, 'update']);
 
     Route::get('/users/{id}/role', [UserController::class, 'getUserRole']);
-    Route::get('/user/{id}/plants', [UserController::class, 'getUserPlants']);
 
     Route::prefix('/plants')->group(function () {
         Route::get('', [PlantController::class, 'index']);
